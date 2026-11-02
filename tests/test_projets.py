@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import patch
 import fakeredis
 import mongomock
 import redis
@@ -37,6 +38,20 @@ class ProjetsTests(unittest.TestCase):
         self.assertEqual(self.b.villes_avec_cache(1)[0]["_id"], "Rabat")
         self.assertEqual(self.b.villes_avec_cache(5)[0]["commandes"], 1)
         self.assertEqual(self.b.commande_avec_cache("CMD-1")["montant"], 50)
+
+    def test_scan_failure_invalidates_known_keys_after_insert(self):
+        self.assertIsNone(self.b.commande_avec_cache("CMD-1"))
+        self.assertEqual(self.b.ca_avec_cache(), [])
+        self.b.villes_avec_cache(5)
+        with patch.object(self.r, "scan_iter", side_effect=redis.ConnectionError("scan failed")):
+            with self.assertLogs(level="WARNING"):
+                identifiant = self.b.ajouter_commande(self.doc())
+        self.assertIsNotNone(identifiant)
+        self.assertEqual(self.c.count_documents({}), 1)
+        self.assertEqual(self.b.commande_avec_cache("CMD-1")["montant"], 50)
+        self.assertEqual(self.b.ca_avec_cache(), [{"_id": "Livre", "total": 50}])
+        # Les tops non parcourus restent bornés par leur TTL existant.
+        self.assertGreater(self.r.ttl("b1:statistiques:top5:villes"), 0)
 
     def test_stale_then_invalidate(self):
         self.c.insert_one(self.doc())
@@ -92,3 +107,4 @@ class ProjetsTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+

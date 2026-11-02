@@ -22,6 +22,8 @@ qui est exclu de la recherche par référence.
 - Clés : b1:commande:REFERENCE:details, b1:statistiques:categories:ca,
   b1:statistiques:topN:villes ; compteurs b1:statistiques:cache:hits et misses.
 - Les clés de chaque top N, le CA et la référence concernée sont invalidés après insertion.
+  Le CA et la référence sont supprimés avant le parcours des tops : si ce parcours échoue,
+  seuls les tops non invalidés peuvent rester périmés jusqu'à leur TTL.
 - Les trois mesures distinguent MongoDB seul, premier appel froid et moyenne des suivants.
   Le CSV indique aussi hits/misses et taux de succès propres à chaque série.
 - Résultats réels dans resultats/mesures.csv et comparaison.png. Aucun gain n'est prérempli.
@@ -43,3 +45,4 @@ Un benchmark dépassant 60 secondes peut inclure des expirations ; contrôler le
 Un index peut rendre la recherche par référence déjà rapide : aucun gain minimal n'est garanti.
 
 Source : [agrégations PyMongo](https://www.mongodb.com/docs/languages/python/pymongo-driver/current/aggregation/).
+

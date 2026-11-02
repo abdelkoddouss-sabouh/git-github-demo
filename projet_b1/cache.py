@@ -95,8 +95,11 @@ class Boutique:
     def invalider(self, reference):
         cles = [PREFIX + f"commande:{reference}:details",
                 PREFIX + "statistiques:categories:ca"]
-        cles.extend(self.cache.scan_iter(match=PREFIX + "statistiques:top*:villes"))
+        # Invalider les clés connues même si le parcours des tops échoue ensuite.
         self.cache.delete(*cles)
+        tops = list(self.cache.scan_iter(match=PREFIX + "statistiques:top*:villes"))
+        if tops:
+            self.cache.delete(*tops)
 
     def ajouter_commande(self, document):
         for champ in ("reference", "client", "categorie", "montant"):
@@ -125,3 +128,4 @@ def connecter():
     collection = mongo[os.getenv("MONGO_DB", "boutique")].commandes
     collection.create_index("reference", unique=True)
     return Boutique(collection, cache)
+
