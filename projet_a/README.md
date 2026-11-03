@@ -2,7 +2,8 @@
 
 Les missions sont dans [quiz.redis](quiz.redis), en commandes Redis.
 Le petit lanceur Python est facultatif : il affiche les commandes et leurs résultats.
-Toutes les commandes de préparation réinitialisent les clés connues de cette démonstration.
+Toutes les commandes de préparation réinitialisent les clés connues de cette démonstration,
+y compris les six profils joueurs, pour éviter qu'un ancien champ ou type de clé perturbe le résultat.
 Utiliser le serveur dédié redis-quiz, pas une base contenant vos vraies données.
 
 Depuis la racine du dépôt, après installation et démarrage décrits dans le README principal :
@@ -54,3 +55,4 @@ Les badges sont ceux des cinq parties fixes ; ils ne sont pas recalculés automa
 
 Sources : [ZRANGE BYSCORE](https://redis.io/docs/latest/commands/zrange/),
 [persistance Redis](https://redis.io/docs/latest/operate/oss_and_stack/management/persistence/).
+

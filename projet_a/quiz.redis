@@ -1,4 +1,5 @@
 # Mission 2 : profils et index. Base Redis du quiz uniquement.
+DEL joueur:j1:profil joueur:j2:profil joueur:j3:profil joueur:j4:profil joueur:j5:profil joueur:j6:profil
 DEL plateforme:quiz:joueurs ville:Rabat:joueurs ville:Casablanca:joueurs ville:Fes:joueurs ville:Tanger:joueurs ville:Marrakech:joueurs
 DEL file:duels:attente classement:general:points plateforme:quiz:parties badge:premiere-victoire:joueurs badge:rapide:joueurs badge:invaincu:joueurs
 DEL partie:1:fiche partie:2:fiche partie:3:fiche partie:4:fiche partie:5:fiche
@@ -96,3 +97,4 @@ SINTER badge:premiere-victoire:joueurs badge:rapide:joueurs
 SCARD badge:premiere-victoire:joueurs
 SUNION badge:premiere-victoire:joueurs badge:rapide:joueurs badge:invaincu:joueurs
 SDIFF plateforme:quiz:joueurs badge:premiere-victoire:joueurs badge:rapide:joueurs badge:invaincu:joueurs
+

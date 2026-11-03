@@ -91,12 +91,16 @@ class ProjetsTests(unittest.TestCase):
         self.assertEqual(self.c.count_documents({}), 12)
 
     def test_quiz_exact_scores_badges_and_rerun(self):
+        # Le reset doit aussi remplacer les anciens profils, même avec un type incompatible.
+        self.r.set("joueur:j1:profil", "ancien-format")
+        self.r.hset("joueur:j2:profil", "champ_obsolete", "reste")
         for _ in range(2):
             executer(self.r, afficher=False)
             self.assertEqual(self.r.zrevrange("classement:general:points", 0, -1, withscores=True),
                              [("j2", 73), ("j1", 55), ("j4", 46), ("j3", 43), ("j6", 15), ("j5", 8)])
             self.assertEqual(self.r.get("plateforme:quiz:parties"), "5")
             self.assertEqual(self.r.hget("joueur:j4:profil", "parties"), "2")
+            self.assertIsNone(self.r.hget("joueur:j2:profil", "champ_obsolete"))
             self.assertEqual(self.r.llen("file:duels:attente"), 0)
             self.assertEqual(self.r.smembers("badge:invaincu:joueurs"), {"j2"})
             self.assertEqual(self.r.sdiff("plateforme:quiz:joueurs",
