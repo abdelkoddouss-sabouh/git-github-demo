@@ -1,0 +1,116 @@
+{
+  "project": "AtlasGuard AI",
+  "source": "synthetic",
+  "seed": 42,
+  "lake": {
+    "rows": 1000000,
+    "fraud_rate": 0.020723,
+    "total_amount": 69643535.40999976,
+    "first_event": "2026-01-01 00:00:00+00:00",
+    "last_event": "2026-12-14 05:19:30+00:00"
+  },
+  "sample_rows": 100000,
+  "lake_sha256": "1458ffae5849962946da3b55146cb54715d0fdc2fe3afaf4f6b1bc3e6bf1a353",
+  "versions": {
+    "python": "3.12.14",
+    "sklearn": "1.8.0"
+  },
+  "split": {
+    "train": {
+      "rows": 60000,
+      "fraud_rate": 0.01845,
+      "first": "2026-01-01 00:00:00+00:00",
+      "last": "2026-07-28 15:11:00+00:00"
+    },
+    "validation": {
+      "rows": 20000,
+      "fraud_rate": 0.02005,
+      "first": "2026-07-28 15:16:30+00:00",
+      "last": "2026-10-06 08:31:00+00:00"
+    },
+    "test": {
+      "rows": 20000,
+      "fraud_rate": 0.03135,
+      "first": "2026-10-06 08:32:00+00:00",
+      "last": "2026-12-14 05:18:30+00:00"
+    }
+  },
+  "selection_metric": "validation average precision",
+  "validation": {
+    "baseline": {
+      "average_precision": 0.02005,
+      "roc_auc": 0.5,
+      "precision": 0.02005,
+      "recall": 1.0,
+      "f1": 0.039311798441252876,
+      "alerts": 20000,
+      "tn": 0,
+      "fp": 19599,
+      "fn": 0,
+      "tp": 401
+    },
+    "logistic": {
+      "average_precision": 0.10205847725822587,
+      "roc_auc": 0.7426128286101421,
+      "precision": 0.1284722222222222,
+      "recall": 0.27680798004987534,
+      "f1": 0.17549407114624507,
+      "alerts": 864,
+      "tn": 18846,
+      "fp": 753,
+      "fn": 290,
+      "tp": 111
+    },
+    "gradient_boosting": {
+      "average_precision": 0.09694197541468978,
+      "roc_auc": 0.7441804820058634,
+      "precision": 0.16470588235294117,
+      "recall": 0.1745635910224439,
+      "f1": 0.1694915254237288,
+      "alerts": 425,
+      "tn": 19244,
+      "fp": 355,
+      "fn": 331,
+      "tp": 70
+    }
+  },
+  "winner": "logistic",
+  "threshold": 0.06182956898211375,
+  "threshold_selection": "validation F1",
+  "test": {
+    "average_precision": 0.19164907461468708,
+    "roc_auc": 0.7935727645415844,
+    "precision": 0.13765182186234817,
+    "recall": 0.4880382775119617,
+    "f1": 0.21473684210526317,
+    "alerts": 2223,
+    "tn": 17456,
+    "fp": 1917,
+    "fn": 321,
+    "tp": 306
+  },
+  "drift_psi": {
+    "amount": 0.0357548451915448,
+    "hour": 0.00020611264659096113,
+    "distance_km": 0.1877196237122744,
+    "attempts_1h": 0.11005703829303741,
+    "account_age_days": 0.0005264927767633713,
+    "international": 0.020149205277625426,
+    "new_device": 0.026338280833474753
+  },
+  "permutation_importance_validation": {
+    "amount": 0.009124345046305762,
+    "hour": 0.005932038288734426,
+    "distance_km": 0.0013028021416495682,
+    "attempts_1h": 0.0606800437937566,
+    "account_age_days": 0.00025944555649320505,
+    "international": 0.027713277663651767,
+    "new_device": 0.04604086368167274
+  },
+  "limitations": [
+    "Synthetic data only; not validated on real fraud",
+    "Batch processing, not a live payment stream",
+    "ML sample capped in memory; lake scans use DuckDB",
+    "Threshold optimizes validation F1, not real monetary cost"
+  ]
+}

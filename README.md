@@ -1,3 +1,9 @@
+# Featured project: AtlasGuard AI
+
+[Explore AtlasGuard AI](atlasguard-ai/) — a million-row synthetic transaction lake, explainable machine learning, an interactive dashboard and a prediction API. Includes measured results and a French learning guide.
+
+---
+
 # Projets Redis — Cache MongoDB et quiz
 
 Deux implémentations pédagogiques des sujets de cours, avec code et instructions de lancement.
@@ -8,7 +14,7 @@ Deux implémentations pédagogiques des sujets de cours, avec code et instructio
 ## Démarrage (Windows PowerShell, Python 3.10+ et Docker Compose)
 
 ```powershell
-git clone https://github.com/beznaaz/git-github-demo.git
+git clone https://github.com/abdelkoddouss-sabouh/git-github-demo.git
 cd git-github-demo
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt

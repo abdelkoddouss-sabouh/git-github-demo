@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="400" viewBox="0 0 1280 400" role="img" aria-labelledby="title desc">
+<title id="title">AtlasGuard AI</title><desc id="desc">Data engineering and explainable fraud detection, a synthetic transaction lab.</desc>
+<defs><linearGradient id="g"><stop stop-color="#0b1020"/><stop offset="1" stop-color="#163c43"/></linearGradient></defs>
+<rect width="1280" height="400" rx="24" fill="url(#g)"/>
+<g stroke="#4fe3c1" opacity=".12" fill="none"><path d="M800 0v400M900 0v400M1000 0v400M1100 0v400M1200 0v400M700 100h580M700 200h580M700 300h580"/></g>
+<text x="64" y="80" font-family="Arial,sans-serif" font-size="16" letter-spacing="4" fill="#4fe3c1">AI + BIG DATA / PORTFOLIO LAB</text>
+<text x="60" y="165" font-family="Arial,sans-serif" font-weight="bold" font-size="70" fill="#f4f7ff">AtlasGuard AI</text>
+<text x="64" y="224" font-family="Arial,sans-serif" font-size="25" fill="#bac9dd">From transactions to explainable risk signals.</text>
+<text x="64" y="294" font-family="Arial,sans-serif" font-size="18" fill="#4fe3c1">PARQUET   /   SQL   /   MACHINE LEARNING   /   DRIFT</text>
+<text x="64" y="350" font-family="Arial,sans-serif" font-size="16" fill="#93a8bb">SYNTHETIC DATA · REPRODUCIBLE EXPERIMENTS · HONEST METRICS</text>
+<g fill="none" stroke="#4fe3c1" stroke-width="4"><path d="M1070 90l100 40v85c0 55-54 89-100 113-46-24-100-58-100-113v-85z"/><path d="M1005 207h35l20-48 30 92 25-44h30"/></g>
+</svg>

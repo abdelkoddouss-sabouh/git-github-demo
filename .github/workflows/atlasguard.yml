@@ -1,0 +1,27 @@
+name: AtlasGuard AI
+on:
+  push:
+    paths: ["atlasguard-ai/**", ".github/workflows/atlasguard.yml"]
+  pull_request:
+    paths: ["atlasguard-ai/**", ".github/workflows/atlasguard.yml"]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      OMP_NUM_THREADS: "2"
+      OPENBLAS_NUM_THREADS: "2"
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.12"]
+    defaults:
+      run:
+        working-directory: atlasguard-ai
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: python -m pip install -e ".[dev]"
+      - run: python -m pytest -q
