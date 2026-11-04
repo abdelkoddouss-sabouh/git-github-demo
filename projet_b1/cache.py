@@ -53,6 +53,8 @@ class Boutique:
     def _avec_cache(self, cle, charger):
         try:
             valeur = self.cache.get(cle)
+        except UnicodeDecodeError:
+            valeur = None  # Redis a renvoyé une valeur qui ne se décode pas en UTF-8.
         except redis.RedisError:
             logging.warning("Redis indisponible : lecture directe dans MongoDB")
             return charger()

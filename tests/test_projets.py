@@ -77,6 +77,15 @@ class ProjetsTests(unittest.TestCase):
         self.assertEqual(self.r.get("unrelated"), "keep")
         self.assertEqual(list(self.r.scan_iter("b1:*")), [])
 
+    def test_invalid_utf8_cache_is_replaced(self):
+        self.c.insert_one(self.doc())
+        key = "b1:commande:CMD-1:details"
+        self.r.set(key, b"\xff")
+        self.assertEqual(self.b.commande_avec_cache("CMD-1")["montant"], 50)
+        self.assertEqual(self.r.get(MISSES), "1")
+        self.assertEqual(self.b.commande_avec_cache("CMD-1")["montant"], 50)
+        self.assertEqual(self.r.get(HITS), "1")
+
     def test_invalid_limits(self):
         for n in (0, -1, True, 1.5):
             with self.assertRaises(ValueError):
