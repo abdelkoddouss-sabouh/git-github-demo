@@ -4,6 +4,8 @@ from projet_b1.cache import connecter
 
 
 def generer(collection, nombre=100000):
+    if not isinstance(nombre, int) or isinstance(nombre, bool) or nombre < 1:
+        raise ValueError("nombre doit être un entier positif")
     if collection.count_documents({}):
         raise ValueError("Collection non vide : génération annulée pour préserver vos données.")
     rng = random.Random(42)

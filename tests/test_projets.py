@@ -93,6 +93,16 @@ class ProjetsTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             mesurer(lambda: None, 0)
 
+    def test_generator_rejects_invalid_counts_before_database_access(self):
+        from unittest.mock import Mock
+        collection = Mock()
+        for nombre in (0, -1, True, 1.5, "12", None):
+            with self.subTest(nombre=nombre):
+                with self.assertRaisesRegex(ValueError, "entier positif"):
+                    generer(collection, nombre)
+        collection.count_documents.assert_not_called()
+        collection.insert_many.assert_not_called()
+
     def test_generator_preserves_existing_data(self):
         self.assertEqual(generer(self.c, 12), 12)
         with self.assertRaises(ValueError):
