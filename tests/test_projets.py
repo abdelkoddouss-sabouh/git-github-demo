@@ -109,6 +109,14 @@ class ProjetsTests(unittest.TestCase):
             generer(self.c, 12)
         self.assertEqual(self.c.count_documents({}), 12)
 
+    def test_quiz_unclosed_transaction_is_reported_and_discarded(self):
+        with patch("projet_a.executer.COMMANDES") as fichier:
+            fichier.read_text.return_value = "MULTI\nSET quiz:incomplete 1\n"
+            with self.assertRaisesRegex(ValueError, "EXEC manquant"):
+                executer(self.r, afficher=False)
+        self.assertIsNone(self.r.get("quiz:incomplete"))
+        self.assertTrue(self.r.ping())
+
     def test_quiz_exact_scores_badges_and_rerun(self):
         # Le reset doit aussi remplacer les anciens profils, même avec un type incompatible.
         self.r.set("joueur:j1:profil", "ancien-format")

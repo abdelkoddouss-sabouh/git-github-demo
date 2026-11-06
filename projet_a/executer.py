@@ -28,6 +28,8 @@ def executer(client, afficher=True):
                 resultat = client.execute_command(*args)
                 if afficher:
                     print(ligne, "->", resultat)
+        if transaction is not None:
+            raise ValueError("Transaction MULTI incomplète : EXEC manquant.")
     finally:
         if transaction is not None:
             transaction.reset()
