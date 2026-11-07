@@ -11,6 +11,8 @@ Ce n'est pas le fichier commandes_donnees.js du professeur. Schéma utilisé :
 ```json
 {"reference":"CMD-073412","client":{"nom":"Client0001","ville":"Rabat"},"categorie":"Livre","montant":5000,"tags":["promo"]}
 ```
+Si `CMD-073412` est absente, lancer `python -m projet_b1.demo --reference CMD-000001`
+en remplaçant `CMD-000001` par une référence présente dans la collection.
 Pour d'autres données, vérifier notamment le chemin client.ville et les montants numériques.
 La référence est indexée et unique. Les documents doivent être sérialisables en JSON hors _id,
 qui est exclu de la recherche par référence.

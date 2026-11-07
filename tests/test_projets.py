@@ -6,6 +6,7 @@ import redis
 from projet_a.executer import executer
 from projet_b1.cache import Boutique, HITS, MISSES, mesurer
 from projet_b1.generer import generer
+from projet_b1.demo import benchmark
 
 
 class ProjetsTests(unittest.TestCase):
@@ -18,6 +19,15 @@ class ProjetsTests(unittest.TestCase):
     def doc(self, ref="CMD-1", ville="Rabat", montant=50):
         return {"reference": ref, "client": {"nom": "A", "ville": ville},
                 "categorie": "Livre", "montant": montant, "tags": []}
+
+    def test_benchmark_rejects_missing_reference_without_clearing_cache(self):
+        self.c.insert_one(self.doc())
+        self.b.commande_avec_cache("CMD-1")
+        with self.assertRaisesRegex(ValueError, "CMD-073412 absente"):
+            benchmark(self.b, repetitions=1)
+        self.assertEqual(self.r.get(MISSES), "1")
+        self.assertEqual(self.b.commande_avec_cache("CMD-1")["montant"], 50)
+        self.assertEqual(self.r.get(HITS), "1")
 
     def test_hit_miss_json_ttl(self):
         self.c.insert_one(self.doc())
