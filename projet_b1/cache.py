@@ -69,7 +69,12 @@ class Boutique:
         self._compter(MISSES)
         resultat = charger()
         try:
-            self.cache.set(cle, json.dumps(resultat, ensure_ascii=False), ex=60)
+            contenu = json.dumps(resultat, ensure_ascii=False)
+        except TypeError:
+            logging.warning("Résultat MongoDB non sérialisable en JSON, cache ignoré")
+            return resultat
+        try:
+            self.cache.set(cle, contenu, ex=60)
         except redis.RedisError:
             logging.warning("Résultat lu, mais non enregistré dans Redis")
         return resultat

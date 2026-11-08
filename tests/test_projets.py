@@ -1,3 +1,4 @@
+from datetime import datetime
 import unittest
 from unittest.mock import patch
 import fakeredis
@@ -28,6 +29,18 @@ class ProjetsTests(unittest.TestCase):
         self.assertEqual(self.r.get(MISSES), "1")
         self.assertEqual(self.b.commande_avec_cache("CMD-1")["montant"], 50)
         self.assertEqual(self.r.get(HITS), "1")
+
+    def test_non_json_mongo_document_is_returned_without_caching(self):
+        date = datetime(2026, 1, 1)
+        self.c.insert_one(dict(self.doc(), date=date))
+
+        with self.assertLogs(level="WARNING"):
+            resultat = self.b.commande_avec_cache("CMD-1")
+
+        self.assertEqual(resultat["date"], date)
+        self.assertIsNone(self.r.get("b1:commande:CMD-1:details"))
+        self.assertEqual(self.r.get(MISSES), "1")
+        self.assertIsNone(self.r.get(HITS))
 
     def test_hit_miss_json_ttl(self):
         self.c.insert_one(self.doc())

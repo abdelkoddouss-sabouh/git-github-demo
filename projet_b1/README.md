@@ -14,8 +14,9 @@ Ce n'est pas le fichier commandes_donnees.js du professeur. Schéma utilisé :
 Si `CMD-073412` est absente, lancer `python -m projet_b1.demo --reference CMD-000001`
 en remplaçant `CMD-000001` par une référence présente dans la collection.
 Pour d'autres données, vérifier notamment le chemin client.ville et les montants numériques.
-La référence est indexée et unique. Les documents doivent être sérialisables en JSON hors _id,
-qui est exclu de la recherche par référence.
+La référence est indexée et unique. La recherche par référence exclut `_id`.
+Un résultat non sérialisable en JSON, par exemple une commande avec une date BSON,
+est renvoyé depuis MongoDB sans être mis en cache.
 
 ## Fonctionnement
 
