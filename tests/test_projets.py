@@ -140,6 +140,19 @@ class ProjetsTests(unittest.TestCase):
         self.assertIsNone(self.r.get("quiz:incomplete"))
         self.assertTrue(self.r.ping())
 
+    def test_quiz_rejects_invalid_transaction_boundaries(self):
+        scripts = [
+            ("# commentaire\nexec\n", "Ligne 2 : EXEC sans MULTI"),
+            ("multi\nSET quiz:pending 1\nmulti\nexec\n", "Ligne 3 : MULTI imbriqué"),
+        ]
+        for script, erreur in scripts:
+            with self.subTest(erreur=erreur):
+                with patch("projet_a.executer.COMMANDES") as fichier:
+                    fichier.read_text.return_value = script
+                    with self.assertRaisesRegex(ValueError, erreur):
+                        executer(self.r, afficher=False)
+                self.assertIsNone(self.r.get("quiz:pending"))
+
     def test_quiz_exact_scores_badges_and_rerun(self):
         # Le reset doit aussi remplacer les anciens profils, même avec un type incompatible.
         self.r.set("joueur:j1:profil", "ancien-format")

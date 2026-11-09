@@ -11,13 +11,19 @@ COMMANDES = Path(__file__).with_name("quiz.redis")
 def executer(client, afficher=True):
     transaction = None
     try:
-        for ligne in COMMANDES.read_text(encoding="utf-8").splitlines():
+        lignes = COMMANDES.read_text(encoding="utf-8").splitlines()
+        for numero, ligne in enumerate(lignes, start=1):
             args = shlex.split(ligne, comments=True)
             if not args:
                 continue
-            if args[0] == "MULTI":
+            commande = args[0].upper()
+            if commande == "MULTI":
+                if transaction is not None:
+                    raise ValueError(f"Ligne {numero} : MULTI imbriqué.")
                 transaction = client.pipeline(transaction=True)
-            elif args[0] == "EXEC":
+            elif commande == "EXEC":
+                if transaction is None:
+                    raise ValueError(f"Ligne {numero} : EXEC sans MULTI.")
                 resultat = transaction.execute()
                 transaction = None
                 if afficher:
