@@ -50,7 +50,7 @@ class Boutique:
         except redis.RedisError:
             logging.warning("Compteurs Redis indisponibles")
 
-    def _avec_cache(self, cle, charger):
+    def _avec_cache(self, cle, charger, types_attendus):
         try:
             valeur = self.cache.get(cle)
         except UnicodeDecodeError:
@@ -64,8 +64,9 @@ class Boutique:
             except (ValueError, TypeError):
                 pass  # Valeur corrompue : la remplacer depuis MongoDB.
             else:
-                self._compter(HITS)
-                return resultat
+                if isinstance(resultat, types_attendus):
+                    self._compter(HITS)
+                    return resultat
         self._compter(MISSES)
         resultat = charger()
         try:
@@ -81,17 +82,18 @@ class Boutique:
 
     def commande_avec_cache(self, reference):
         return self._avec_cache(PREFIX + f"commande:{reference}:details",
-                                lambda: self.commande_par_reference(reference))
+                                lambda: self.commande_par_reference(reference),
+                                (dict, type(None)))
 
     def ca_avec_cache(self):
         return self._avec_cache(PREFIX + "statistiques:categories:ca",
-                                self.chiffre_affaires_par_categorie)
+                                self.chiffre_affaires_par_categorie, list)
 
     def villes_avec_cache(self, n=5):
         if not isinstance(n, int) or isinstance(n, bool) or n < 1:
             raise ValueError("n doit être un entier positif")
         return self._avec_cache(PREFIX + f"statistiques:top{n}:villes",
-                                lambda: self.top_villes(n))
+                                lambda: self.top_villes(n), list)
 
     def vider_cache(self):
         # Pas de FLUSHDB : seules les clés de CE projet sont concernées.

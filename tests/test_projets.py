@@ -42,6 +42,21 @@ class ProjetsTests(unittest.TestCase):
         self.assertEqual(self.r.get(MISSES), "1")
         self.assertIsNone(self.r.get(HITS))
 
+    def test_cache_reloads_valid_json_with_wrong_result_type(self):
+        self.c.insert_one(self.doc())
+        reference = "b1:commande:CMD-1:details"
+        categories = "b1:statistiques:categories:ca"
+        villes = "b1:statistiques:top5:villes"
+        self.r.mset({reference: "[]", categories: "null", villes: "{}"})
+
+        self.assertEqual(self.b.commande_avec_cache("CMD-1")["montant"], 50)
+        self.assertEqual(self.b.ca_avec_cache(), [{"_id": "Livre", "total": 50}])
+        self.assertEqual(self.b.villes_avec_cache(), [{"_id": "Rabat", "commandes": 1}])
+        self.assertEqual(self.r.get(MISSES), "3")
+        self.assertIsNone(self.r.get(HITS))
+        self.assertEqual(self.b.ca_avec_cache(), [{"_id": "Livre", "total": 50}])
+        self.assertEqual(self.r.get(HITS), "1")
+
     def test_hit_miss_json_ttl(self):
         self.c.insert_one(self.doc())
         a = self.b.commande_avec_cache("CMD-1")
