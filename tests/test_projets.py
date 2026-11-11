@@ -1,4 +1,6 @@
 from datetime import datetime
+from contextlib import redirect_stdout
+from io import StringIO
 import unittest
 from unittest.mock import patch
 import fakeredis
@@ -167,6 +169,21 @@ class ProjetsTests(unittest.TestCase):
                     with self.assertRaisesRegex(ValueError, erreur):
                         executer(self.r, afficher=False)
                 self.assertIsNone(self.r.get("quiz:pending"))
+
+    def test_quiz_pairs_players_in_fifo_order(self):
+        sortie = StringIO()
+        with redirect_stdout(sortie):
+            executer(self.r)
+
+        duels = [
+            ligne for ligne in sortie.getvalue().splitlines()
+            if ligne.startswith("LPOP file:duels:attente ")
+        ]
+        self.assertEqual(duels, [
+            "LPOP file:duels:attente 2 -> ['j3', 'j1']",
+            "LPOP file:duels:attente 2 -> ['j5', 'j2']",
+            "LPOP file:duels:attente 2 -> ['j4', 'j6']",
+        ])
 
     def test_quiz_exact_scores_badges_and_rerun(self):
         # Le reset doit aussi remplacer les anciens profils, même avec un type incompatible.
