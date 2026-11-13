@@ -29,7 +29,8 @@ est renvoyé depuis MongoDB sans être mis en cache.
   seuls les tops non invalidés peuvent rester périmés jusqu'à leur TTL.
 - Les trois mesures distinguent MongoDB seul, premier appel froid et moyenne des suivants.
   Le CSV indique aussi hits/misses et taux de succès propres à chaque série.
-  Une série sans lecture servie par Redis interrompt le benchmark avant l’export.
+  Le benchmark s’arrête avant l’export si une série ne contient aucun hit Redis
+  ou si les compteurs ne correspondent pas au nombre de lectures.
 - Résultats réels dans resultats/mesures.csv et comparaison.png. Aucun gain n'est prérempli.
 - Démonstration CMD-100001 : insertion directe périmant le cache, puis insertion avec
   invalidation. La commande temporaire est retirée à la fin. Si elle existe déjà, la démo refuse de la supprimer.

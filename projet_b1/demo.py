@@ -27,10 +27,12 @@ def benchmark(boutique, repetitions=100, *, reference="CMD-073412"):
         misses = int(boutique.cache.get(MISSES) or 0)
         if not hits:
             raise ValueError(f"{nom} : aucune lecture servie par Redis, gain impossible à mesurer.")
+        if hits + misses != repetitions + 1:
+            raise ValueError(f"{nom} : compteurs Redis incohérents avec le nombre de lectures.")
         lignes.append({"fonction": nom, "sans_cache_ms": sans, "premier_ms": premier,
                        "suivants_ms": suivants, "gain": sans / suivants if suivants else 0,
                        "hits": hits, "misses": misses,
-                       "taux_succes": hits / (hits + misses) if hits + misses else 0})
+                       "taux_succes": hits / (hits + misses)})
     return lignes
 
 

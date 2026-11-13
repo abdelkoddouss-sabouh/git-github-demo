@@ -38,6 +38,21 @@ class ProjetsTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "Reference : aucune lecture servie par Redis"):
                 benchmark(self.b, repetitions=1, reference="CMD-1")
 
+    def test_benchmark_rejects_incomplete_redis_counters(self):
+        self.c.insert_one(self.doc())
+        incrementer = self.r.incr
+
+        def incrementer_sauf_miss(cle):
+            if cle == MISSES:
+                raise redis.ConnectionError("compteur indisponible")
+            return incrementer(cle)
+
+        with patch.object(self.r, "incr", side_effect=incrementer_sauf_miss):
+            with self.assertLogs(level="WARNING"):
+                with self.assertRaisesRegex(ValueError, "Reference : compteurs Redis incohérents"):
+                    benchmark(self.b, repetitions=1, reference="CMD-1")
+        self.assertEqual(self.r.get(HITS), "1")
+
     def test_non_json_mongo_document_is_returned_without_caching(self):
         date = datetime(2026, 1, 1)
         self.c.insert_one(dict(self.doc(), date=date))
