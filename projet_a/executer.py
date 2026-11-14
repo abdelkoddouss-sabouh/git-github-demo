@@ -17,6 +17,8 @@ def executer(client, afficher=True):
             if not args:
                 continue
             commande = args[0].upper()
+            if commande in ("MULTI", "EXEC") and len(args) != 1:
+                raise ValueError(f"Ligne {numero} : {commande} ne prend aucun argument.")
             if commande == "MULTI":
                 if transaction is not None:
                     raise ValueError(f"Ligne {numero} : MULTI imbriqué.")

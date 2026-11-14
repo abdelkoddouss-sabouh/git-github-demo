@@ -191,6 +191,18 @@ class ProjetsTests(unittest.TestCase):
                         executer(self.r, afficher=False)
                 self.assertIsNone(self.r.get("quiz:pending"))
 
+    def test_quiz_rejects_arguments_on_transaction_commands(self):
+        for script, erreur in [
+            ("MULTI extra\nSET quiz:pending 1\nEXEC\n", "Ligne 1 : MULTI"),
+            ("MULTI\nSET quiz:pending 1\nEXEC extra\n", "Ligne 3 : EXEC"),
+        ]:
+            with self.subTest(erreur=erreur):
+                with patch("projet_a.executer.COMMANDES") as fichier:
+                    fichier.read_text.return_value = script
+                    with self.assertRaisesRegex(ValueError, erreur + " ne prend aucun argument"):
+                        executer(self.r, afficher=False)
+                self.assertIsNone(self.r.get("quiz:pending"))
+
     def test_quiz_pairs_players_in_fifo_order(self):
         sortie = StringIO()
         with redirect_stdout(sortie):
