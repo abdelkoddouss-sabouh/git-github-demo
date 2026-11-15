@@ -9,7 +9,7 @@ import redis
 from projet_a.executer import executer
 from projet_b1.cache import Boutique, HITS, MISSES, mesurer
 from projet_b1.generer import generer
-from projet_b1.demo import benchmark
+from projet_b1.demo import benchmark, demonstration_invalidation
 
 
 class ProjetsTests(unittest.TestCase):
@@ -121,6 +121,26 @@ class ProjetsTests(unittest.TestCase):
         self.assertEqual(self.b.ca_avec_cache()[0]["total"], 50)
         self.b.invalider("CMD-2")
         self.assertEqual(self.b.ca_avec_cache()[0]["total"], 100)
+
+    def test_invalidation_demo_preserves_existing_orders_and_refreshes_cache(self):
+        self.c.insert_one(self.doc())
+        sortie = StringIO()
+        with redirect_stdout(sortie):
+            demonstration_invalidation(self.b)
+
+        self.assertIn("Après insertion directe (cache) : 50", sortie.getvalue())
+        self.assertIn("Après insertion avec invalidation : 5050", sortie.getvalue())
+        self.assertEqual(self.c.count_documents({}), 1)
+        self.assertIsNone(self.b.commande_avec_cache("CMD-100001"))
+        self.assertEqual(self.b.ca_avec_cache(), [{"_id": "Livre", "total": 50}])
+
+    def test_invalidation_demo_refuses_an_existing_example_reference(self):
+        self.c.insert_one(self.doc("CMD-100001"))
+        with self.assertRaisesRegex(ValueError, "CMD-100001 existe déjà"):
+            demonstration_invalidation(self.b)
+
+        self.assertEqual(self.c.count_documents({}), 1)
+        self.assertEqual(self.b.commande_par_reference("CMD-100001"), self.doc("CMD-100001"))
 
     def test_redis_failure_reads_mongo(self):
         self.c.insert_one(self.doc())
