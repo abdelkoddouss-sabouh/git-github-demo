@@ -1,4 +1,5 @@
 """Données synthétiques reproductibles : ne remplace pas le fichier du professeur."""
+import argparse
 import random
 from projet_b1.cache import connecter
 
@@ -25,6 +26,15 @@ def generer(collection, nombre=100000):
     return collection.count_documents({})
 
 
-if __name__ == "__main__":
+def main():
+    parser = argparse.ArgumentParser(description="Générer des commandes synthétiques.")
+    parser.add_argument("--nombre", type=int, default=100000, help="Nombre de commandes")
+    args = parser.parse_args()
+    if args.nombre < 1:
+        parser.error("--nombre doit être un entier positif")
     boutique = connecter()
-    print("Commandes générées :", generer(boutique.commandes))
+    print("Commandes générées :", generer(boutique.commandes, args.nombre))
+
+
+if __name__ == "__main__":
+    main()

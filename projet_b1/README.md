@@ -11,6 +11,9 @@ Ce n'est pas le fichier commandes_donnees.js du professeur. Schéma utilisé :
 ```json
 {"reference":"CMD-073412","client":{"nom":"Client0001","ville":"Rabat"},"categorie":"Livre","montant":5000,"tags":["promo"]}
 ```
+Pour un essai rapide sur une collection vide, lancer `python -m projet_b1.generer --nombre 10`,
+puis `python -m projet_b1.demo --reference CMD-000001`.
+
 Si `CMD-073412` est absente, lancer `python -m projet_b1.demo --reference CMD-000001`
 en remplaçant `CMD-000001` par une référence présente dans la collection.
 Pour d'autres données, vérifier notamment le chemin client.ville et les montants numériques.

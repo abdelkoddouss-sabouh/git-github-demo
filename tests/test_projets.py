@@ -8,7 +8,7 @@ import mongomock
 import redis
 from projet_a.executer import executer
 from projet_b1.cache import Boutique, HITS, MISSES, mesurer
-from projet_b1.generer import generer
+from projet_b1.generer import generer, main as generer_cli
 from projet_b1.demo import benchmark, demonstration_invalidation
 
 
@@ -183,6 +183,13 @@ class ProjetsTests(unittest.TestCase):
                     generer(collection, nombre)
         collection.count_documents.assert_not_called()
         collection.insert_many.assert_not_called()
+
+    def test_generator_cli_accepts_small_dataset(self):
+        with patch("sys.argv", ["generer", "--nombre", "3"]):
+            with patch("projet_b1.generer.connecter", return_value=self.b):
+                with redirect_stdout(StringIO()):
+                    generer_cli()
+        self.assertEqual(self.c.count_documents({}), 3)
 
     def test_generator_preserves_existing_data(self):
         self.assertEqual(generer(self.c, 12), 12)
