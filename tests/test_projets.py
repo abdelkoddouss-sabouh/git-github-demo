@@ -230,6 +230,13 @@ class ProjetsTests(unittest.TestCase):
                         executer(self.r, afficher=False)
                 self.assertIsNone(self.r.get("quiz:pending"))
 
+    def test_quiz_reports_unclosed_quotes_and_discards_pending_commands(self):
+        with patch("projet_a.executer.COMMANDES") as fichier:
+            fichier.read_text.return_value = 'MULTI\nSET quiz:pending 1\nSET quiz:text "incomplet\nEXEC\n'
+            with self.assertRaisesRegex(ValueError, "Ligne 3 : syntaxe invalide"):
+                executer(self.r, afficher=False)
+        self.assertIsNone(self.r.get("quiz:pending"))
+
     def test_quiz_pairs_players_in_fifo_order(self):
         sortie = StringIO()
         with redirect_stdout(sortie):

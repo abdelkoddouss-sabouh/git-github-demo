@@ -13,7 +13,10 @@ def executer(client, afficher=True):
     try:
         lignes = COMMANDES.read_text(encoding="utf-8").splitlines()
         for numero, ligne in enumerate(lignes, start=1):
-            args = shlex.split(ligne, comments=True)
+            try:
+                args = shlex.split(ligne, comments=True)
+            except ValueError as exc:
+                raise ValueError(f"Ligne {numero} : syntaxe invalide ({exc}).") from exc
             if not args:
                 continue
             commande = args[0].upper()
