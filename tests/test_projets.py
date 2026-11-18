@@ -142,6 +142,19 @@ class ProjetsTests(unittest.TestCase):
         self.assertEqual(self.c.count_documents({}), 1)
         self.assertEqual(self.b.commande_par_reference("CMD-100001"), self.doc("CMD-100001"))
 
+    def test_cache_write_failure_still_returns_mongo_result(self):
+        self.c.insert_one(self.doc())
+        with patch.object(self.r, "set", side_effect=redis.ConnectionError("offline")):
+            with self.assertLogs(level="WARNING"):
+                resultat = self.b.commande_avec_cache("CMD-1")
+        self.assertEqual(resultat, self.doc())
+        self.assertIsNone(self.r.get("b1:commande:CMD-1:details"))
+        self.assertEqual(self.r.get(MISSES), "1")
+        self.assertEqual(self.b.commande_avec_cache("CMD-1"), resultat)
+        self.assertEqual(self.b.commande_avec_cache("CMD-1"), resultat)
+        self.assertEqual(self.r.get(MISSES), "2")
+        self.assertEqual(self.r.get(HITS), "1")
+
     def test_redis_failure_reads_mongo(self):
         self.c.insert_one(self.doc())
         class Down:
