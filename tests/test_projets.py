@@ -204,6 +204,17 @@ class ProjetsTests(unittest.TestCase):
                     generer_cli()
         self.assertEqual(self.c.count_documents({}), 3)
 
+    def test_generator_flushes_final_partial_batch_reproducibly(self):
+        autre = mongomock.MongoClient().boutique.commandes
+        with patch.object(self.c, "insert_many", wraps=self.c.insert_many) as inserer:
+            self.assertEqual(generer(self.c, 1001), 1001)
+        self.assertEqual([len(appel.args[0]) for appel in inserer.call_args_list], [1000, 1])
+        self.assertEqual(generer(autre, 1001), 1001)
+        projection = {"_id": 0}
+        self.assertEqual(list(self.c.find({}, projection).sort("reference")),
+                         list(autre.find({}, projection).sort("reference")))
+        self.assertIsNotNone(self.c.find_one({"reference": "CMD-001001"}))
+
     def test_generator_preserves_existing_data(self):
         self.assertEqual(generer(self.c, 12), 12)
         with self.assertRaises(ValueError):
