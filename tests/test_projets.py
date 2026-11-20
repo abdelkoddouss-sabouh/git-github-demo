@@ -155,6 +155,18 @@ class ProjetsTests(unittest.TestCase):
         self.assertEqual(self.r.get(MISSES), "2")
         self.assertEqual(self.r.get(HITS), "1")
 
+    def test_duplicate_order_preserves_database_and_cached_results(self):
+        self.b.ajouter_commande(self.doc())
+        self.b.commande_avec_cache("CMD-1")
+        self.b.ca_avec_cache()
+        avant = {cle: self.r.get(cle) for cle in self.r.scan_iter("b1:*")}
+        from pymongo.errors import DuplicateKeyError
+        with self.assertRaises(DuplicateKeyError):
+            self.b.ajouter_commande(self.doc(montant=999))
+        self.assertEqual(self.c.count_documents({}), 1)
+        self.assertEqual(self.b.commande_par_reference("CMD-1")["montant"], 50)
+        self.assertEqual({cle: self.r.get(cle) for cle in self.r.scan_iter("b1:*")}, avant)
+
     def test_redis_failure_reads_mongo(self):
         self.c.insert_one(self.doc())
         class Down:
