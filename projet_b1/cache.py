@@ -13,8 +13,8 @@ MISSES = PREFIX + "statistiques:cache:misses"
 
 
 def mesurer(fonction, repetitions=100):
-    if repetitions < 1:
-        raise ValueError("repetitions doit être positif")
+    if not isinstance(repetitions, int) or isinstance(repetitions, bool) or repetitions < 1:
+        raise ValueError("repetitions doit être un entier positif")
     debut = perf_counter()
     for _ in range(repetitions):
         fonction()

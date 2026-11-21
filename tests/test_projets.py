@@ -199,6 +199,15 @@ class ProjetsTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             mesurer(lambda: None, 0)
 
+    def test_measure_rejects_invalid_repetitions_before_calling_function(self):
+        from unittest.mock import Mock
+        fonction = Mock()
+        for repetitions in (0, -1, True, 1.5, "2", None):
+            with self.subTest(repetitions=repetitions):
+                with self.assertRaisesRegex(ValueError, "entier positif"):
+                    mesurer(fonction, repetitions)
+        fonction.assert_not_called()
+
     def test_generator_rejects_invalid_counts_before_database_access(self):
         from unittest.mock import Mock
         collection = Mock()
