@@ -57,7 +57,8 @@ def demonstration_invalidation(boutique):
         identifiant = boutique.ajouter_commande(document)
         apres = total_livre(boutique)
         print("Après insertion avec invalidation :", apres)
-        assert apres == avant + 5000
+        if apres != avant + 5000:
+            raise ValueError("Invalidation non vérifiée : le CA attendu doit augmenter de 5000.")
     finally:
         if identifiant is not None:
             boutique.commandes.delete_one({"_id": identifiant})

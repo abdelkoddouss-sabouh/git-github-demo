@@ -134,6 +134,15 @@ class ProjetsTests(unittest.TestCase):
         self.assertIsNone(self.b.commande_avec_cache("CMD-100001"))
         self.assertEqual(self.b.ca_avec_cache(), [{"_id": "Livre", "total": 50}])
 
+    def test_invalidation_demo_reports_stale_result_and_cleans_up(self):
+        self.c.insert_one(self.doc())
+        with patch("projet_b1.demo.total_livre", side_effect=[50, 50, 50]):
+            with redirect_stdout(StringIO()):
+                with self.assertRaisesRegex(ValueError, "Invalidation non vérifiée"):
+                    demonstration_invalidation(self.b)
+        self.assertIsNone(self.c.find_one({"reference": "CMD-100001"}))
+        self.assertEqual(self.c.count_documents({}), 1)
+
     def test_invalidation_demo_refuses_an_existing_example_reference(self):
         self.c.insert_one(self.doc("CMD-100001"))
         with self.assertRaisesRegex(ValueError, "CMD-100001 existe déjà"):
