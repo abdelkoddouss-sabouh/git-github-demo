@@ -291,6 +291,14 @@ class ProjetsTests(unittest.TestCase):
                 executer(self.r, afficher=False)
         self.assertIsNone(self.r.get("quiz:pending"))
 
+    def test_quiz_preserves_keys_outside_demo(self):
+        self.r.set("application:configuration", "conserver")
+        self.r.hset("joueur:j7:profil", mapping={"pseudo": "Autre", "parties": "9"})
+        executer(self.r, afficher=False)
+        self.assertEqual(self.r.get("application:configuration"), "conserver")
+        self.assertEqual(self.r.hgetall("joueur:j7:profil"),
+                         {"pseudo": "Autre", "parties": "9"})
+
     def test_quiz_pairs_players_in_fifo_order(self):
         sortie = StringIO()
         with redirect_stdout(sortie):
