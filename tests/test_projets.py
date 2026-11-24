@@ -176,6 +176,15 @@ class ProjetsTests(unittest.TestCase):
         self.assertEqual(self.b.commande_par_reference("CMD-1")["montant"], 50)
         self.assertEqual({cle: self.r.get(cle) for cle in self.r.scan_iter("b1:*")}, avant)
 
+    def test_cached_missing_order_avoids_repeated_mongo_reads(self):
+        with patch.object(self.c, "find_one", wraps=self.c.find_one) as chercher:
+            self.assertIsNone(self.b.commande_avec_cache("ABSENTE"))
+            self.assertIsNone(self.b.commande_avec_cache("ABSENTE"))
+        chercher.assert_called_once_with({"reference": "ABSENTE"}, {"_id": 0})
+        self.assertEqual(self.r.get(MISSES), "1")
+        self.assertEqual(self.r.get(HITS), "1")
+        self.assertGreater(self.r.ttl("b1:commande:ABSENTE:details"), 0)
+
     def test_redis_failure_reads_mongo(self):
         self.c.insert_one(self.doc())
         class Down:
