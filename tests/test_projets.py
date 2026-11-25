@@ -185,6 +185,18 @@ class ProjetsTests(unittest.TestCase):
         self.assertEqual(self.r.get(HITS), "1")
         self.assertGreater(self.r.ttl("b1:commande:ABSENTE:details"), 0)
 
+    def test_expired_cache_reloads_updated_mongo_order(self):
+        self.c.insert_one(self.doc())
+        self.assertEqual(self.b.commande_avec_cache("CMD-1")["montant"], 50)
+        self.c.update_one({"reference": "CMD-1"}, {"$set": {"montant": 75}})
+        self.assertEqual(self.b.commande_avec_cache("CMD-1")["montant"], 50)
+        # Simuler une entrée déjà expirée sans attendre les 60 secondes du TTL.
+        self.r.pexpireat("b1:commande:CMD-1:details", 1)
+        self.assertEqual(self.b.commande_avec_cache("CMD-1")["montant"], 75)
+        self.assertEqual(self.r.get(MISSES), "2")
+        self.assertEqual(self.r.get(HITS), "1")
+        self.assertGreater(self.r.ttl("b1:commande:CMD-1:details"), 0)
+
     def test_redis_failure_reads_mongo(self):
         self.c.insert_one(self.doc())
         class Down:
