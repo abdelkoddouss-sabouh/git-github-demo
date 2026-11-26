@@ -320,6 +320,18 @@ class ProjetsTests(unittest.TestCase):
         self.assertEqual(self.r.hgetall("joueur:j7:profil"),
                          {"pseudo": "Autre", "parties": "9"})
 
+    def test_quiz_command_parsing_preserves_quoted_values_and_comments(self):
+        script = (
+            "# commentaire seul\n\n"
+            'SET quiz:message "Bonjour tout le monde # quiz" # commentaire\n'
+            'MULTI # transaction\nSET quiz:autre "deux mots"\nEXEC # fin\n'
+        )
+        with patch("projet_a.executer.COMMANDES") as fichier:
+            fichier.read_text.return_value = script
+            executer(self.r, afficher=False)
+        self.assertEqual(self.r.get("quiz:message"), "Bonjour tout le monde # quiz")
+        self.assertEqual(self.r.get("quiz:autre"), "deux mots")
+
     def test_quiz_pairs_players_in_fifo_order(self):
         sortie = StringIO()
         with redirect_stdout(sortie):
