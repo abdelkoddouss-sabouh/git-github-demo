@@ -197,6 +197,17 @@ class ProjetsTests(unittest.TestCase):
         self.assertEqual(self.r.get(HITS), "1")
         self.assertGreater(self.r.ttl("b1:commande:CMD-1:details"), 0)
 
+    def test_mongo_read_failure_does_not_cache_a_missing_order(self):
+        from pymongo.errors import AutoReconnect
+        with patch.object(self.c, "find_one", side_effect=AutoReconnect("offline")):
+            with self.assertRaises(AutoReconnect):
+                self.b.commande_avec_cache("CMD-1")
+        self.assertIsNone(self.r.get("b1:commande:CMD-1:details"))
+        self.c.insert_one(self.doc())
+        self.assertEqual(self.b.commande_avec_cache("CMD-1"), self.doc())
+        self.assertEqual(self.r.get(MISSES), "2")
+        self.assertIsNone(self.r.get(HITS))
+
     def test_redis_failure_reads_mongo(self):
         self.c.insert_one(self.doc())
         class Down:
