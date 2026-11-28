@@ -208,6 +208,16 @@ class ProjetsTests(unittest.TestCase):
         self.assertEqual(self.r.get(MISSES), "2")
         self.assertIsNone(self.r.get(HITS))
 
+    def test_cached_order_is_available_during_mongo_outage(self):
+        self.c.insert_one(self.doc())
+        self.b.commande_avec_cache("CMD-1")
+        from pymongo.errors import AutoReconnect
+        with patch.object(self.c, "find_one", side_effect=AutoReconnect("offline")) as chercher:
+            self.assertEqual(self.b.commande_avec_cache("CMD-1"), self.doc())
+        chercher.assert_not_called()
+        self.assertEqual(self.r.get(HITS), "1")
+        self.assertEqual(self.r.get(MISSES), "1")
+
     def test_redis_failure_reads_mongo(self):
         self.c.insert_one(self.doc())
         class Down:
